@@ -1,10 +1,17 @@
 <?php
 
-define('DB_HOST', 'localhost');
+/*define('DB_HOST', 'localhost');
 define('DB_PORT', '3307');
 define('DB_NAME', 'sistema_marcaciones');
 define('DB_USER', 'root');
-define('DB_PASS', '1234');
+define('DB_PASS', '1234');*/
+
+define('DB_HOST', 'shortline.proxy.rlwy.net');
+define('DB_PORT', '41356');
+define('DB_NAME', 'railway');
+define('DB_USER', 'root');
+define('DB_PASS', 'dYKeUdEmXOryFZzUsmEOHpOgeZYWRLcj');
+
 define('DB_CHARSET', 'utf8mb4');
 define('JWT_SECRET', 'jwt1254');
 define('JWT_EXPIRATION', 86400);

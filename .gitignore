@@ -1,0 +1,83 @@
+# Archivos de configuración sensibles
+includes/config.php
+config.php
+.env
+.env.local
+
+# Credenciales y claves
+*.pem
+*.key
+*.cert
+*.crt
+
+# Composer
+/vendor/
+composer.phar
+composer.lock
+
+# Logs
+*.log
+/logs/
+/log/
+
+# Archivos temporales y caché
+/cache/
+/tmp/
+*.tmp
+*.cache
+
+# Archivos de sesión
+/sessions/
+*.sess
+
+# Archivos de subida (uploads)
+/uploads/*
+!/uploads/.gitkeep
+
+# Sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDEs y editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.project
+.buildpath
+.settings/
+nbproject/
+
+# Archivos de backup
+*.bak
+*.backup
+*.old
+*~
+
+# Node modules (si usas herramientas de frontend)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos SQL de backup
+*.sql.backup
+*.sql.bak
+backup-*.sql
+
+# PHPUnit y testing
+.phpunit.result.cache
+/coverage/
+
+# Archivos de depuración
+xdebug.log
+php_errors.log
+error_log

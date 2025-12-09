@@ -1,6 +1,5 @@
 <?php
 
-
 require_once __DIR__ . '/config.php';
 
 function getConnection() {
@@ -17,6 +16,7 @@ function getConnection() {
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
             ];
 
             $connection = new PDO($dsn, DB_USER, DB_PASS, $options);
@@ -33,9 +33,14 @@ function getConnection() {
     return $connection;
 }
 
-
 function callProcedure($procedureName, $params = []) {
     $db = getConnection();
+
+    if (empty($params)) {
+        $sql = "CALL $procedureName()";
+        $stmt = $db->prepare($sql);
+        return $stmt->execute();
+    }
 
     $placeholders = str_repeat('?,', count($params) - 1) . '?';
     $sql = "CALL $procedureName($placeholders)";
