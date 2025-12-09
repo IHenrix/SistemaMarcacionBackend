@@ -56,14 +56,30 @@ function validateJWT($jwt) {
 }
 
 function getTokenFromHeader() {
-    $headers = getallheaders();
+    $authHeader = null;
 
-    if (isset($headers['Authorization'])) {
-        $authHeader = $headers['Authorization'];
-
-        if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-            return $matches[1];
+    // Try getallheaders first
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        if (isset($headers['Authorization'])) {
+            $authHeader = $headers['Authorization'];
+        } elseif (isset($headers['authorization'])) {
+            $authHeader = $headers['authorization'];
         }
+    }
+
+    // Try $_SERVER alternatives for Apache/XAMPP
+    if (!$authHeader && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+    }
+
+    if (!$authHeader && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    }
+
+    // Extract token from "Bearer TOKEN" format
+    if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+        return $matches[1];
     }
 
     return null;
