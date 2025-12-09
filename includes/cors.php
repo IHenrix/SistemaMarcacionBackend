@@ -1,7 +1,16 @@
 <?php
 
 function cors() {
-    header('Access-Control-Allow-Origin: http://localhost:4200');
+    $allowedOrigins = [
+        'http://localhost:4200',
+        'https://abril-delicias-helados-api-beeqh3e8emc5gebr.centralus-01.azurewebsites.net'
+    ];
+
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+    if (in_array($origin, $allowedOrigins)) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+    }
 
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 
@@ -11,7 +20,6 @@ function cors() {
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    // Manejar peticiones OPTIONS (preflight)
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(200);
         exit(0);
