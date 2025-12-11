@@ -3,7 +3,7 @@
 function cors() {
     $allowedOrigins = [
         'http://localhost:4200',
-        'https://abril-delicias-helados-h5grfde5c9csgxhq.brazilsouth-01.azurewebsites.net'
+        'https://abril-delicias-helados-api-beeqh3e8emc5gebr.centralus-01.azurewebsites.net'
     ];
 
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

@@ -207,4 +207,17 @@ CREATE TABLE token_recuperacion_password (
   INDEX idx_usado (usado),
   INDEX idx_expiracion (fecha_expiracion)
 ) ENGINE=InnoDB;
-
+CREATE TABLE contacto (
+  id_contacto int(11) NOT NULL AUTO_INCREMENT,
+  nombre varchar(120) COLLATE utf8mb4_general_ci NOT NULL,
+  email varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  telefono varchar(30) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  tipo varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  asunto varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  mensaje text COLLATE utf8mb4_general_ci NOT NULL,
+  archivo_blob longblob DEFAULT NULL,
+  archivo_nombre varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  archivo_tipo varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  creado_en datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (id_contacto)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

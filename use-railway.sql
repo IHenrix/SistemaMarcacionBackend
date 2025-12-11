@@ -1,4 +1,10 @@
-use railway;
+/*DROP DATABASE IF EXISTS sistema_marcaciones;
+
+CREATE DATABASE sistema_marcaciones
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;*/
+
+USE railway;
 
 CREATE TABLE area (
   id_area     INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,9 +36,9 @@ CREATE TABLE usuario (
   id_persona          INT NOT NULL,
   username            VARCHAR(100) NOT NULL UNIQUE,
   password            VARCHAR(100) NOT NULL,
-  intentos_fallidos   TINYINT(1) NOT NULL DEFAULT 0,
-  bloqueado           TINYINT(1) NOT NULL DEFAULT 0,
+  intentos_fallidos   INT DEFAULT 0,
   fecha_ultimo_acceso DATETIME NULL,
+  estado              CHAR(1) DEFAULT 'A' NOT NULL,
   fecha_bloqueo       DATETIME NULL,
   FOREIGN KEY (id_persona) REFERENCES persona(id_persona)
 ) ENGINE=InnoDB;
@@ -57,7 +63,7 @@ INSERT INTO rol (nombre) VALUES
 ('OPERATIVO');
 
 INSERT INTO persona (dni, nombres, apellidos, telefono, correo, id_area) VALUES
-('75911772', 'Ricardo Enrique', 'Prada Guerra',  '912016162', 'enrique.pdg@hotmail.com', 2),
+('75911772', 'Ricardo Enrique', 'Prada Guerra',  '912016162', 'enrique.pdg@gmail.com', 2),
 ('74816492', 'Juan Jose',       'Morales Velasquez', NULL, 'juan.morales@empresa.com', 1),
 ('73186556', 'Fabrizzio Hernan','Cornejo Luyo',      NULL, 'fabrizzio.cornejo@empresa.com', 3),
 ('70000004', 'Jenniffer',       'Rodríguez Tezen',   NULL, 'jenniffer.rodriguez@empresa.com', 4);
@@ -80,18 +86,31 @@ DELIMITER //
 
 CREATE PROCEDURE registrar_intento_fallido(IN p_username VARCHAR(100))
 BEGIN
+  DECLARE nuevos_intentos INT;
+
+  -- Incrementar intentos fallidos
   UPDATE usuario
-  SET intentos_fallidos = intentos_fallidos + 1,
-      bloqueado = CASE WHEN intentos_fallidos + 1 > 3 THEN 1 ELSE bloqueado END,
-      fecha_bloqueo = CASE WHEN intentos_fallidos + 1 > 3 THEN NOW() ELSE fecha_bloqueo END
+  SET intentos_fallidos = intentos_fallidos + 1
   WHERE username = p_username;
+
+  -- Obtener el nuevo valor
+  SELECT intentos_fallidos INTO nuevos_intentos
+  FROM usuario
+  WHERE username = p_username;
+
+  -- Bloquear solo si alcanzó 3 intentos
+  IF nuevos_intentos >= 3 THEN
+    UPDATE usuario
+    SET estado = 'B', fecha_bloqueo = NOW()
+    WHERE username = p_username;
+  END IF;
 END //
 
 CREATE PROCEDURE resetear_intentos_login(IN p_username VARCHAR(100))
 BEGIN
   UPDATE usuario
   SET intentos_fallidos = 0,
-      bloqueado = 0,
+      estado = 'A',
       fecha_bloqueo = NULL
   WHERE username = p_username;
 END //
@@ -170,4 +189,35 @@ CREATE TABLE marcacion (
   UNIQUE KEY uq_marcacion_persona_fecha_tipo (id_persona, fecha, tipo)
 ) ENGINE=InnoDB;
 
-SELECT * from usuario;
+-- Tabla para tokens de recuperación de contraseña
+CREATE TABLE token_recuperacion_password (
+  id_token            INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario          INT NOT NULL,
+  token               TEXT NOT NULL,
+  email               VARCHAR(150) NOT NULL,
+  fecha_solicitud     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_expiracion    DATETIME NOT NULL,
+  usado               TINYINT(1) NOT NULL DEFAULT 0,
+  fecha_uso           DATETIME NULL,
+  ip_solicitud        VARCHAR(45),
+  ip_uso              VARCHAR(45),
+  FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+  INDEX idx_token (token(255)),
+  INDEX idx_usuario (id_usuario),
+  INDEX idx_usado (usado),
+  INDEX idx_expiracion (fecha_expiracion)
+) ENGINE=InnoDB;
+CREATE TABLE contacto (
+  id_contacto int(11) NOT NULL AUTO_INCREMENT,
+  nombre varchar(120) COLLATE utf8mb4_general_ci NOT NULL,
+  email varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  telefono varchar(30) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  tipo varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  asunto varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  mensaje text COLLATE utf8mb4_general_ci NOT NULL,
+  archivo_blob longblob DEFAULT NULL,
+  archivo_nombre varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  archivo_tipo varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  creado_en datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (id_contacto)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
