@@ -61,7 +61,7 @@ INSERT INTO rol (nombre) VALUES
 ('OPERATIVO');
 
 INSERT INTO persona (dni, nombres, apellidos, telefono, correo, id_area) VALUES
-('75911772', 'Ricardo Enrique', 'Prada Guerra',  '912016162', 'enrique.pdg@hotmail.com', 2),
+('75911772', 'Ricardo Enrique', 'Prada Guerra',  '912016162', 'enrique.pdg@gmail.com', 2),
 ('74816492', 'Juan Jose',       'Morales Velasquez', NULL, 'juan.morales@empresa.com', 1),
 ('73186556', 'Fabrizzio Hernan','Cornejo Luyo',      NULL, 'fabrizzio.cornejo@empresa.com', 3),
 ('70000004', 'Jenniffer',       'Rodríguez Tezen',   NULL, 'jenniffer.rodriguez@empresa.com', 4);
@@ -172,5 +172,24 @@ CREATE TABLE marcacion (
   FOREIGN KEY (id_persona) REFERENCES persona(id_persona),
   FOREIGN KEY (id_horario_resuelto) REFERENCES horario(id_horario),
   UNIQUE KEY uq_marcacion_persona_fecha_tipo (id_persona, fecha, tipo)
+) ENGINE=InnoDB;
+
+-- Tabla para tokens de recuperación de contraseña
+CREATE TABLE token_recuperacion_password (
+  id_token            INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario          INT NOT NULL,
+  token               TEXT NOT NULL,
+  email               VARCHAR(150) NOT NULL,
+  fecha_solicitud     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_expiracion    DATETIME NOT NULL,
+  usado               TINYINT(1) NOT NULL DEFAULT 0,
+  fecha_uso           DATETIME NULL,
+  ip_solicitud        VARCHAR(45),
+  ip_uso              VARCHAR(45),
+  FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+  INDEX idx_token (token(255)),
+  INDEX idx_usuario (id_usuario),
+  INDEX idx_usado (usado),
+  INDEX idx_expiracion (fecha_expiracion)
 ) ENGINE=InnoDB;
 
