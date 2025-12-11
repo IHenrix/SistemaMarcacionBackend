@@ -1,4 +1,6 @@
-CREATE DATABASE IF NOT EXISTS sistema_marcaciones
+DROP DATABASE IF EXISTS sistema_marcaciones;
+
+CREATE DATABASE sistema_marcaciones
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_unicode_ci;
 
@@ -84,11 +86,24 @@ DELIMITER //
 
 CREATE PROCEDURE registrar_intento_fallido(IN p_username VARCHAR(100))
 BEGIN
+  DECLARE nuevos_intentos INT;
+
+  -- Incrementar intentos fallidos
   UPDATE usuario
-  SET intentos_fallidos = intentos_fallidos + 1,
-      estado = CASE WHEN intentos_fallidos + 1 >= 3 THEN 'B' ELSE estado END,
-      fecha_bloqueo = CASE WHEN intentos_fallidos + 1 >= 3 THEN NOW() ELSE fecha_bloqueo END
+  SET intentos_fallidos = intentos_fallidos + 1
   WHERE username = p_username;
+
+  -- Obtener el nuevo valor
+  SELECT intentos_fallidos INTO nuevos_intentos
+  FROM usuario
+  WHERE username = p_username;
+
+  -- Bloquear solo si alcanzó 3 intentos
+  IF nuevos_intentos >= 3 THEN
+    UPDATE usuario
+    SET estado = 'B', fecha_bloqueo = NOW()
+    WHERE username = p_username;
+  END IF;
 END //
 
 CREATE PROCEDURE resetear_intentos_login(IN p_username VARCHAR(100))
