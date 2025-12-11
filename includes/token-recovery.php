@@ -82,8 +82,8 @@ function obtenerIPCliente() {
  */
 function enviarEmailRecuperacion($destinatario, $nombreUsuario, $token) {
     // URL del frontend según ambiente
-    $frontendUrl = 'http://localhost:4200';  // Dev
-    // $frontendUrl = 'https://tu-frontend-prod.azurewebsites.net';  // Prod
+    //$frontendUrl = 'http://localhost:4200';  // Dev
+     $frontendUrl = 'https://abril-delicias-helados-h5grfde5c9csgxhq.brazilsouth-01.azurewebsites.net';  // Prod
 
     $resetLink = $frontendUrl . '/reset-password?token=' . urlencode($token);
 
