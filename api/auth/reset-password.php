@@ -88,10 +88,10 @@ try {
             'id_token' => $tokenData['id_token']
         ]);
 
-        // 8. RESETEAR INTENTOS FALLIDOS (opcional pero recomendado)
+        // 8. RESETEAR INTENTOS FALLIDOS Y DESBLOQUEAR USUARIO
         $sqlResetAttempts = "
             UPDATE usuario
-            SET intentos_fallidos = 0, bloqueado = 0, fecha_bloqueo = NULL
+            SET intentos_fallidos = 0, estado = 'A', fecha_bloqueo = NULL
             WHERE id_usuario = :id_usuario
         ";
 

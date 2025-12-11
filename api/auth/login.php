@@ -27,7 +27,7 @@ try {
             u.username,
             u.password,
             u.intentos_fallidos,
-            u.bloqueado,
+            u.estado as estado_usuario,
             u.fecha_bloqueo,
             u.fecha_ultimo_acceso,
             p.dni,
@@ -36,7 +36,7 @@ try {
             p.telefono,
             p.correo,
             p.id_area,
-            p.estado,
+            p.estado as estado_persona,
             a.nombre as area_nombre,
             a.descripcion as area_descripcion
         FROM usuario u
@@ -53,11 +53,15 @@ try {
         sendError('Ha introducido un usuario o una contraseña incorrectos', 404);
     }
 
-    if ($user['bloqueado'] == 1) {
+    if ($user['estado_usuario'] == 'B') {
         sendError('Usuario bloqueado por múltiples intentos fallidos. Contacte al administrador.', 403);
     }
 
-    if ($user['estado'] == 0) {
+    if ($user['estado_usuario'] == 'I') {
+        sendError('Usuario inactivo. Contacte al administrador.', 403);
+    }
+
+    if ($user['estado_persona'] == 0) {
         sendError('Usuario inactivo. Contacte al administrador.', 403);
     }
 
@@ -75,11 +79,16 @@ try {
         $stmt->execute(['username' => $username]);
         $user = $stmt->fetch();
 
-        if ($user['bloqueado'] == 1) {
+        if ($user['estado_usuario'] == 'B') {
             sendError('Usuario bloqueado por múltiples intentos fallidos.', 403);
         }
 
-        sendError('Ha introducido un nombre de usuario o una contraseña incorrectos', 401);
+        $intentosRestantes = 3 - $user['intentos_fallidos'];
+        if ($intentosRestantes > 0) {
+            sendError('Ha introducido un nombre de usuario o una contraseña incorrectos. Le quedan ' . $intentosRestantes . ' intentos.', 401);
+        } else {
+            sendError('Ha introducido un nombre de usuario o una contraseña incorrectos', 401);
+        }
     }
 
     callProcedure('resetear_intentos_login', [$username]);

@@ -34,9 +34,9 @@ CREATE TABLE usuario (
   id_persona          INT NOT NULL,
   username            VARCHAR(100) NOT NULL UNIQUE,
   password            VARCHAR(100) NOT NULL,
-  intentos_fallidos   TINYINT(1) NOT NULL DEFAULT 0,
-  bloqueado           TINYINT(1) NOT NULL DEFAULT 0,
+  intentos_fallidos   INT DEFAULT 0,
   fecha_ultimo_acceso DATETIME NULL,
+  estado              CHAR(1) DEFAULT 'A' NOT NULL,
   fecha_bloqueo       DATETIME NULL,
   FOREIGN KEY (id_persona) REFERENCES persona(id_persona)
 ) ENGINE=InnoDB;
@@ -86,8 +86,8 @@ CREATE PROCEDURE registrar_intento_fallido(IN p_username VARCHAR(100))
 BEGIN
   UPDATE usuario
   SET intentos_fallidos = intentos_fallidos + 1,
-      bloqueado = CASE WHEN intentos_fallidos + 1 > 3 THEN 1 ELSE bloqueado END,
-      fecha_bloqueo = CASE WHEN intentos_fallidos + 1 > 3 THEN NOW() ELSE fecha_bloqueo END
+      estado = CASE WHEN intentos_fallidos + 1 >= 3 THEN 'B' ELSE estado END,
+      fecha_bloqueo = CASE WHEN intentos_fallidos + 1 >= 3 THEN NOW() ELSE fecha_bloqueo END
   WHERE username = p_username;
 END //
 
@@ -95,7 +95,7 @@ CREATE PROCEDURE resetear_intentos_login(IN p_username VARCHAR(100))
 BEGIN
   UPDATE usuario
   SET intentos_fallidos = 0,
-      bloqueado = 0,
+      estado = 'A',
       fecha_bloqueo = NULL
   WHERE username = p_username;
 END //
